@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pearl Jewels — Account</title>
+<style>
+/* Basic Reset */
+* { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+body { background: #FAFAFA; color: #1F1F2E; }
+
+/* Header */
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 2rem;
+  background: #fff;
+  border-bottom: 2px solid #f0f0f0;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+header h1 { font-size: 1.8rem; color: #121212; font-weight: bold; }
+nav a { margin-left: 1.5rem; color: #121212; text-decoration: none; transition: 0.3s; }
+nav a:hover { color: #FF69B4; }
+nav button { margin-left: 1.5rem; padding: 0.5rem 1rem; border-radius: 6px; border: none; background: #FF69B4; color: #fff; cursor: pointer; transition: 0.3s; }
+nav button:hover { background: #FF1493; }
+
+/* Account Section */
+.account-section {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 75vh;
+  padding: 2rem 1rem;
+}
+
+.account-card {
+  background: linear-gradient(145deg, #ffffff, #ffe6f0);
+  border-radius: 20px;
+  padding: 3rem 2rem;
+  max-width: 450px;
+  width: 100%;
+  text-align: center;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+.account-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 30px rgba(0,0,0,0.12);
+}
+
+.account-card h2 { color: #FF69B4; font-size: 2rem; margin-bottom: 1.5rem; }
+.account-card p { font-size: 1rem; color: #333; margin-bottom: 0.8rem; }
+.account-card button#logout-btn { margin-top: 1rem; padding: 0.6rem 1.2rem; border-radius: 8px; border: none; background: #FF69B4; color: #fff; cursor: pointer; transition: 0.3s; }
+.account-card button#logout-btn:hover { background: #FF1493; }
+
+/* Modal */
+.modal {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  opacity: 0; pointer-events: none;
+  transition: 0.3s;
+  z-index: 1000;
+}
+.modal.open { opacity: 1; pointer-events: auto; }
+
+.modal-content {
+  background: #fff0f8;
+  padding: 2rem;
+  border-radius: 15px;
+  width: 90%;
+  max-width: 400px;
+  text-align: center;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+}
+.modal-content h3 { color: #FF69B4; margin-bottom: 1rem; }
+
+.input-group { position: relative; margin-bottom: 1rem; }
+input {
+  width: 100%;
+  padding: 0.8rem;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  background: #FAFAFA;
+  color: #1F1F2E;
+}
+
+.eye {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+}
+
+button.form-btn {
+  width: 100%;
+  padding: 0.8rem;
+  background: #1F1F2E;
+  color: #FAFAFA;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  margin-bottom: 0.5rem;
+}
+button.form-btn:hover { background: #3A3A4A; }
+
+p.toggle-text { text-align: center; cursor: pointer; color: #1F1F2E; margin-top: 0.5rem; }
+
+/* Footer */
+footer {
+  text-align: center;
+  padding: 2rem;
+  background: #fff;
+  color: #888;
+  font-size: 0.9rem;
+  border-top: 2px solid #f0f0f0;
+}
+
+/* Responsive */
+@media(max-width: 500px) {
+  .account-card { padding: 2rem 1.5rem; }
+  header { flex-direction: column; align-items: flex-start; }
+  nav { margin-top: 0.5rem; }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Pearl Jewels</h1>
+  <nav>
+    <a href="/">Home</a>
+    <a href="account.html" class="active">Account</a>
+    <button id="logout-btn">Logout</button>
+  </nav>
+</header>
+
+<section class="account-section">
+  <div class="account-card">
+    <h2>Welcome, <span id="user-name">Loading...</span>!</h2>
+    <div class="info">
+      <p><strong>Email:</strong> <span id="user-email">Loading...</span></p>
+      <p><strong>Phone:</strong> <span id="user-phone">N/A</span></p>
+    </div>
+    <button id="logout-btn">Logout</button>
+  </div>
+</section>
+
+<!-- Login/Signup Modal -->
+<div id="modal" class="modal">
+  <div class="modal-content">
+    <h3 id="form-title">Login</h3>
+    <div class="input-group"><input type="email" id="email" placeholder="Email"></div>
+    <div class="input-group">
+      <input type="password" id="password" placeholder="Password">
+      <span class="eye" id="togglePassword">&#128065;</span>
+    </div>
+    <div class="input-group"><input type="text" id="name" placeholder="Full Name" style="display:none;"></div>
+    <div class="input-group"><input type="text" id="contact" placeholder="Contact Number" style="display:none;"></div>
+    <div class="input-group">
+      <input type="password" id="confirmPassword" placeholder="Confirm Password" style="display:none;">
+      <span class="eye" id="toggleConfirm" style="display:none;">&#128065;</span>
+    </div>
+    <button id="submit-btn" class="form-btn">Login</button>
+    <p class="toggle-text" id="toggle">Don't have an account? Signup</p>
+  </div>
+</div>
+
+<footer>
+  &copy; 2025 Pearl Jewels. Delivering Premium Jewellery Across India.
+</footer>
+
+<script>
+let isLogin = true;
+const modal = document.getElementById("modal");
+const emailInput = document.getElementById('email');
+const passwordInput = document.getElementById('password');
+const nameInput = document.getElementById('name');
+const contactInput = document.getElementById('contact');
+const confirmInput = document.getElementById('confirmPassword');
+const togglePassword = document.getElementById('togglePassword');
+const toggleConfirm = document.getElementById('toggleConfirm');
+const formTitle = document.getElementById('form-title');
+const submitBtn = document.getElementById('submit-btn');
+const toggleText = document.getElementById('toggle');
+
+// Check login status
+document.addEventListener("DOMContentLoaded", async () => {
+  const token = localStorage.getItem("token");
+  if (!token) { modal.classList.add("open"); return; }
+  try {
+    const res = await fetch("http://localhost:5000/api/me", { headers: { Authorization: `Bearer ${token}` } });
+    const data = await res.json();
+    if (data.success) {
+      document.getElementById("user-name").textContent = data.user.name;
+      document.getElementById("user-email").textContent = data.user.email;
+      document.getElementById("user-phone").textContent = data.user.phone || "N/A";
+    } else { modal.classList.add("open"); }
+  } catch (err) { console.error(err); modal.classList.add("open"); }
+});
+
+// Logout
+document.querySelectorAll("#logout-btn").forEach(btn => {
+  btn.addEventListener("click", () => {
+    localStorage.removeItem("token");
+    alert("Logged out successfully!");
+    modal.classList.add("open");
+  });
+});
+
+// Toggle login/signup form
+toggleText.addEventListener('click', () => {
+  isLogin = !isLogin;
+  nameInput.style.display = isLogin ? 'none' : 'block';
+  contactInput.style.display = isLogin ? 'none' : 'block';
+  confirmInput.style.display = isLogin ? 'none' : 'block';
+  toggleConfirm.style.display = isLogin ? 'none' : 'block';
+  formTitle.innerText = isLogin ? 'Login' : 'Signup';
+  submitBtn.innerText = isLogin ? 'Login' : 'Signup';
+  toggleText.textContent = isLogin ? "Don't have an account? Signup" : "Already have an account? Login";
+});
+
+// Show/hide password
+togglePassword.addEventListener('click', () => { passwordInput.type = passwordInput.type === 'password' ? 'text' : 'password'; });
+toggleConfirm.addEventListener('click', () => { confirmInput.type = confirmInput.type === 'password' ? 'text' : 'password'; });
+
+// Submit form
+submitBtn.addEventListener('click', async () => {
+  const email = emailInput.value.trim();
+  const password = passwordInput.value.trim();
+  const name = nameInput.value.trim();
+  const contact = contactInput.value.trim();
+  const confirmPassword = confirmInput.value.trim();
+  if (!email || !password || (!isLogin && (!name || !contact || !confirmPassword))) { alert('Please fill all fields.'); return; }
+  if (!isLogin && password !== confirmPassword) { alert('Passwords do not match.'); return; }
+  const API_BASE = 'http://localhost:5000/api';
+  const url = isLogin ? `${API_BASE}/login` : `${API_BASE}/signup`;
+  const body = isLogin ? { email, password } : { name, email, password, contact };
+  try {
+    const res = await fetch(url, { method:'POST', headers:{ 'Content-Type':'application/json' }, body: JSON.stringify(body) });
+    const data = await res.json();
+    if (res.ok && data.success) {
+      localStorage.setItem('token', data.token);
+      alert(isLogin ? 'Login successful!' : 'Signup successful!');
+      modal.classList.remove("open");
+      location.reload();
+    } else { alert(data.message || 'Error occurred'); }
+  } catch(err) { console.error(err); alert('Network error — check backend.'); }
+});
+</script>
+
+</body>
+</html>

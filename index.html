@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pearl Jewels — Gold, Silver & Artificial Jewellery</title>
+  <meta name="description" content="Shop premium gold, silver and artificial jewellery across India. Pearl Jewels brings you professional, minimal, dark-themed, all-in-one jewellery shopping experience.">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <header>
+    <div class="header-left">
+      <h1>Pearl Jewells</h1>
+      
+    </div>
+
+    <div class="search-box">
+      <input type="text" id="search-input" placeholder="Search for jewellery...">
+      <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
+      </svg>
+    </div>
+
+    <div class="header-right">
+      <nav>
+        <a href="#products">Shop</a>
+        <a href="account.html">Account</a>
+        <a href="#" onclick="toggleModal('cart-modal')">Cart (<span id="cart-count">0</span>)</a>
+        <a href="#" onclick="toggleModal('wishlist-modal')">Wishlist (<span id="wishlist-count">0</span>)</a>
+      </nav>
+    </div>
+  </header>
+
+  <section class="hero">
+    <div class="hero-bg"></div>
+    <div class="hero-content">
+      <h2>Discover Exquisite Jewellery</h2>
+      <p>Shop premium gold, silver and artificial jewellery across India. Experience luxury, elegance, and quality with Pearl Jewels.</p>
+      <button onclick="scrollToProducts()">Shop Now</button>
+    </div>
+  </section>
+
+  <section class="filter-bar">
+    <select id="filter-type" onchange="applyFilters()">
+      <option value="all">Shop by Category</option>
+      <option value="ring">Ring</option>
+      <option value="necklace">Necklace</option>
+      <option value="bracelet">Bracelet</option>
+      <option value="earring">Earring</option>
+      <option value="chain">Chain</option>
+      <option value="mangalsutra">Mangalsutra</option>
+    </select>
+
+    <select id="filter-material" onchange="applyFilters()">
+      <option value="all">Types</option>
+      <option value="gold">Gold</option>
+      <option value="rose gold">Rose Gold</option>
+      <option value="silver">Silver</option>
+      <option value="artificial">Artificial</option>
+    </select>
+
+    <select id="sort-price" onchange="applyFilters()">
+      <option value="default">Sort by Price</option>
+      <option value="low">Low to High</option>
+      <option value="high">High to Low</option>
+    </select>
+    <button onclick="resetFilters()">Reset Filters</button>
+  </section>
+
+  <section id="products" class="products">
+    <!-- Products loaded dynamically -->
+  </section>
+
+  <!-- 🛒 Cart Modal -->
+  <div id="cart-modal" class="modal" aria-hidden="true">
+    <div class="modal-content">
+      <span class="close" onclick="toggleModal('cart-modal')">&times;</span>
+      <h2>Your Cart</h2>
+      <div id="cart-items"></div>
+      <p id="cart-total"></p>
+      <button id="proceed-payment">Proceed to Payment</button>
+    </div>
+  </div>
+
+  <!-- 💖 Wishlist Modal -->
+  <div id="wishlist-modal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="toggleModal('wishlist-modal')">&times;</span>
+      <h3>Your Wishlist</h3>
+      <div id="wishlist-items"></div>
+    </div>
+  </div>
+
+  <!-- 🔍 Product Detail Modal -->
+  <div id="product-detail-modal" class="modal">
+    <div class="modal-content product-detail-content">
+      <span class="close" onclick="toggleModal('product-detail-modal')">&times;</span>
+      <div class="product-detail-layout">
+        <div class="product-detail-image">
+          <img id="detail-img" src="" alt="Product Image">
+        </div>
+        <div class="product-detail-info">
+          <h2 id="detail-name">Product Name</h2>
+          <p class="price" id="detail-price">₹0</p>
+          <p id="detail-desc">Product description goes here.</p>
+          <div class="modal-actions">
+            <button class="add-to-cart" id="detail-add-cart">Add to Cart</button>
+            <button class="wishlist-btn" id="detail-add-wishlist">❤️</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    &copy; 2025 Pearl Jewels. Delivering Premium Jewellery Across India.
+  </footer>
+
+  <script src="script.js"></script>
+  <script>
+    const token = localStorage.getItem("token");
+    const accountLink = document.querySelector('a[href="account.html"]');
+    if (token && accountLink) {
+      accountLink.textContent = "Account";
+      accountLink.href = "account.html";
+    }
+  </script>
+</body>
+</html>

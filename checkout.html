@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Checkout - Pearl Jewels</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f7f7f7;
+      margin: 0;
+      padding: 0;
+    }
+    .checkout-container {
+      max-width: 600px;
+      margin: 3rem auto;
+      background: #fff;
+      padding: 2rem;
+      border-radius: 10px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+    h2 {
+      text-align: center;
+      margin-bottom: 1.5rem;
+      color: #1F1F2E;
+    }
+    form label {
+      display: block;
+      margin: 0.5rem 0 0.2rem;
+      font-weight: bold;
+    }
+    form input, form select {
+      width: 100%;
+      padding: 0.7rem;
+      margin-bottom: 1rem;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+    button {
+      background: #cf168e;
+      color: #fff;
+      border: none;
+      padding: 0.8rem 1.5rem;
+      border-radius: 8px;
+      cursor: pointer;
+      width: 100%;
+      font-size: 1rem;
+    }
+    button:hover { background: #3A3A4A; }
+  </style>
+</head>
+<body>
+  <div class="checkout-container">
+    <h2>Checkout</h2>
+    <form id="checkout-form">
+      <label for="name">Full Name</label>
+      <input type="text" id="name" required>
+
+      <label for="email">Email</label>
+      <input type="email" id="email" required>
+
+      <label for="phone">Phone Number</label>
+      <input type="tel" id="phone" required pattern="[0-9]{10}" placeholder="Enter 10-digit number">
+
+      <label for="address">Address</label>
+      <input type="text" id="address" required>
+
+      <label for="city">City</label>
+      <input type="text" id="city" required>
+
+      <label for="state">State</label>
+      <input type="text" id="state" required>
+
+      <label for="pincode">Pincode</label>
+      <input type="text" id="pincode" required>
+
+      <label for="paymentMethod">Payment Method</label>
+      <select id="paymentMethod" required>
+        <option value="cod">Cash on Delivery</option>
+        <option value="card">Card</option>
+        <option value="razorpay">Razorpay</option>
+      </select>
+
+      <button type="submit">Place Order</button>
+    </form>
+  </div>
+
+  <!-- Razorpay JS -->
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+  <script>
+    // ✅ Redirect to account  if not logged in
+    const token = localStorage.getItem('token');
+    if (!token) {
+      alert("Please login first!");
+      window.location.href = "account.html";
+    }
+
+    const checkoutForm = document.getElementById('checkout-form');
+
+    // ✅ Place order function
+    async function placeOrder(razorpay_payment_id = null) {
+      const cart = JSON.parse(localStorage.getItem('cart')) || [];
+      const total = cart.reduce((sum, item) => sum + item.price * item.qty, 0);
+
+      const shipping = {
+        name: document.getElementById('name').value,
+        email: document.getElementById('email').value,
+        phone: document.getElementById('phone').value,
+        address: document.getElementById('address').value,
+        city: document.getElementById('city').value,
+        state: document.getElementById('state').value,
+        pincode: document.getElementById('pincode').value,
+      };
+
+      const paymentMethod = document.getElementById('paymentMethod').value;
+
+      try {
+        const res = await fetch('http://localhost:5000/api/orders', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + token
+          },
+          body: JSON.stringify({
+            items: cart,
+            total,
+            shipping,
+            paymentMethod,
+            paymentId: razorpay_payment_id
+          })
+        });
+
+        const data = await res.json();
+        if (!data.success) return alert('Order failed: ' + data.message);
+
+        localStorage.removeItem('cart');
+        alert('Order placed successfully!');
+        window.location.href = 'index.html';
+      } catch (err) {
+        console.error('Order failed:', err);
+        alert('Could not place order. Please try again.');
+      }
+    }
+
+    // ✅ Checkout form submit handler
+    checkoutForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const cart = JSON.parse(localStorage.getItem('cart')) || [];
+      if (!cart.length) {
+        alert("Your cart is empty!");
+        window.location.href = "index.html";
+        return;
+      }
+
+      const total = cart.reduce((sum, item) => sum + item.price * item.qty, 0);
+      const shipping = {
+        name: document.getElementById('name').value,
+        email: document.getElementById('email').value,
+        phone: document.getElementById('phone').value,
+        address: document.getElementById('address').value,
+        city: document.getElementById('city').value,
+        state: document.getElementById('state').value,
+        pincode: document.getElementById('pincode').value,
+      };
+
+      const paymentMethod = document.getElementById('paymentMethod').value;
+
+      if (paymentMethod === 'razorpay') {
+        try {
+          const orderRes = await fetch('http://localhost:5000/api/razorpay/order', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': 'Bearer ' + token
+            },
+            body: JSON.stringify({ amount: total * 100 })
+          });
+
+          if (!orderRes.ok) return alert('Failed to initiate payment');
+
+          const orderData = await orderRes.json();
+          if (!orderData.success) return alert('Failed to initiate payment');
+
+          const options = {
+            key: "rzp_test_RRScpn6JyjUsOG",
+            amount: total * 100,
+            currency: "INR",
+            name: "Pearl Jewels",
+            description: "Order Payment",
+            order_id: orderData.order.id,
+            handler: async function(response) {
+              await placeOrder(response.razorpay_payment_id);
+            },
+            prefill: {
+              name: shipping.name,
+              email: shipping.email,
+              contact: shipping.phone
+            }
+          };
+
+          const rzp = new Razorpay(options);
+          rzp.open();
+        } catch (err) {
+          console.error('Payment initiation failed:', err);
+          alert('Could not connect to server. Please try again.');
+        }
+      } else {
+        // COD or Card
+        await placeOrder();
+      }
+    });
+  </script>
+</body>
+</html>
